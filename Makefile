@@ -24,9 +24,13 @@ $(HANDLER).so: *.go
 	go build -buildmode=plugin -ldflags='-w -s' -o $(HANDLER).so
 	chown $(shell stat -c '%u:%g' .) $(HANDLER).so
 
-$(PACKAGE).zip: $(HANDLER).so $(HANDLER)/*
+$(HANDLER)/shim.so: $(HANDLER)/*.go $(HANDLER)/*.c
+	cd $(HANDLER)
+	go build -buildmode=plugin -ldflags='-w -s' -o shim.so
+
+$(PACKAGE).zip: $(HANDLER)/shim.so $(HANDLER).so $(HANDLER)/*
 	zip -q $(PACKAGE).zip $(HANDLER).so
-	zip -q -r $(PACKAGE).zip $(HANDLER)
+	zip -q -r $(PACKAGE).zip $(HANDLER)/shim.so $(HANDLER)/*.py
 	chown $(shell stat -c '%u:%g' .) $(PACKAGE).zip
 
 clean:
