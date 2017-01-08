@@ -1,2 +1,4 @@
 *.so
 *.zip
+tmp
+handler/*.so
